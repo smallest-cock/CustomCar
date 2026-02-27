@@ -20,15 +20,15 @@ permissions:
 
 jobs:
     check-changelog:
-        name: Check changelog (main)
+        name: Check changelog (master)
         runs-on: windows-latest
         outputs:
             changelog: ${{ steps.changelog.outputs.changelog }}
         steps:
-            - name: 📥 Checkout repository (main)
+            - name: 📥 Checkout repository (master)
               uses: actions/checkout@v4
               with:
-                  ref: main
+                  ref: master
                   submodules: false
 
             - name: 📝 Extract changes from changelog
