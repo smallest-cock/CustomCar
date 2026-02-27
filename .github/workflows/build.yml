@@ -94,10 +94,10 @@ jobs:
                   mv ./scripts/install.bat temp/installation_zip
                   7z a "dist/${{ env.PLUGIN_NAME }}.zip" ./temp/installation_zip/*
 
-            - name: 🔑 Attest release ZIP
-              uses: actions/attest-build-provenance@v3
-              with:
-                  subject-path: "dist/${{ env.PLUGIN_NAME }}.zip"
+            # - name: 🔑 Attest release ZIP
+            #   uses: actions/attest-build-provenance@v3
+            #   with:
+            #       subject-path: "dist/${{ env.PLUGIN_NAME }}.zip"
 
             - name: 🚀 Create release
               id: create_release
