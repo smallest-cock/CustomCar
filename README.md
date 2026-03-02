@@ -1,6 +1,8 @@
 # Custom Car (BakkesMod plugin)
 Enables custom cars in Rocket League, for free!
 
+<img src="./assets/screenshots/mc_boat_still.png" width="80%"/>
+
 ## ✨ Features
 - Use custom 3D models for car bodies and toppers
 - Spawn and use any existing RL car body
