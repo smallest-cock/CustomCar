@@ -9,29 +9,40 @@
 #include "components/GameCars.hpp"
 
 void CustomCar::RenderSettings() {
-	auto enabled_cvar = getCvar(Cvars::enabled);
+	const float contentHeight = ImGui::GetContentRegionAvail().y - FOOTER_HEIGHT;
+	{
+		GUI::ScopedChild c{"MainSettingsSection", ImVec2(0, contentHeight)};
 
-	GUI::Spacing(4);
+		GUI::alt_settings_header(h_label.c_str(), plugin_version_display, gameWrapper);
 
-	bool enabled = enabled_cvar.getBoolValue();
-	if (ImGui::Checkbox("Enable", &enabled))
-		enabled_cvar.setValue(enabled);
+		auto enabled_cvar = getCvar(Cvars::enabled);
 
-	GUI::Spacing(4);
+		GUI::Spacing(4);
 
-	std::string openMenuCommand = "togglemenu " + GetMenuName();
-	if (ImGui::Button("Open Menu")) {
-		GAME_THREAD_EXECUTE({ cvarManager->executeCommand(openMenuCommand); }, openMenuCommand);
+		bool enabled = enabled_cvar.getBoolValue();
+		if (ImGui::Checkbox("Enable", &enabled))
+			enabled_cvar.setValue(enabled);
+
+		GUI::Spacing(4);
+
+		std::string openMenuCommand = "togglemenu " + GetMenuName();
+		if (ImGui::Button("Open Menu")) {
+			GAME_THREAD_EXECUTE({ cvarManager->executeCommand(openMenuCommand); }, openMenuCommand);
+		}
+
+		GUI::Spacing(4);
+
+		ImGui::TextUnformatted("Or bind this command:");
+
+		GUI::SameLineSpacing_relative(20.0f);
+
+		ImGui::SetNextItemWidth(180.0f);
+		ImGui::InputText("", &openMenuCommand, ImGuiInputTextFlags_ReadOnly);
+
+		GUI::CopyButton("Copy", openMenuCommand.c_str());
 	}
 
-	GUI::Spacing(4);
-
-	ImGui::TextUnformatted("Or bind this command:");
-
-	GUI::SameLineSpacing_relative(20.0f);
-
-	ImGui::SetNextItemWidth(180.0f);
-	ImGui::InputText("", &openMenuCommand, ImGuiInputTextFlags_ReadOnly);
+	GUI::alt_settings_footer("Need help? Join the Discord", "https://discord.gg/d5ahhQmJbJ");
 }
 
 void CustomCar::RenderWindow() {

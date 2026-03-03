@@ -1,140 +1,141 @@
 name: 🧱 Build DLL (Windows)
 
 env:
-    PLUGIN_NAME: CustomCar
-    TAG_NAME: ${{ github.event.inputs.tag || github.ref_name }}
+  PLUGIN_NAME: CustomCar
+  PLUGIN_NAME_FORMATTED: Custom Car
+  TAG_NAME: ${{ github.event.inputs.tag || github.ref_name }}
 
 on:
-    push:
-        tags:
-            - "v*.*.*"
-    workflow_dispatch:
-        inputs:
-            tag:
-                description: "Release tag (e.g. v1.0.1)"
-                required: true
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g. v1.0.1)"
+        required: true
 permissions:
-    contents: write
-    id-token: write
-    attestations: write
+  contents: write
+  id-token: write
+  attestations: write
 
 jobs:
-    check-changelog:
-        name: Check changelog (master)
-        runs-on: windows-latest
-        outputs:
-            changelog: ${{ steps.changelog.outputs.changelog }}
-        steps:
-            - name: 📥 Checkout repository (master)
-              uses: actions/checkout@v4
-              with:
-                  ref: master
-                  submodules: false
+  check-changelog:
+    name: Check changelog (master)
+    runs-on: windows-latest
+    outputs:
+      changelog: ${{ steps.changelog.outputs.changelog }}
+    steps:
+      - name: 📥 Checkout repository (master)
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          submodules: false
 
-            - name: 📝 Extract changes from changelog
-              id: changelog
-              shell: bash
-              run: |
-                  # Prefer manual input if available
-                  TAG="${{ github.event.inputs.tag || github.ref_name }}"
+      - name: 📝 Extract changes from changelog
+        id: changelog
+        shell: bash
+        run: |
+          # Prefer manual input if available
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
 
-                  # fail if tag not found in CHANGELOG.md
-                  if ! grep -q "^## $TAG" CHANGELOG.md; then
-                    echo "❌ Tag '$TAG' not found in CHANGELOG.md"
-                    exit 1
-                  fi
+          # fail if tag not found in CHANGELOG.md
+          if ! grep -q "^## $TAG" CHANGELOG.md; then
+            echo "❌ Tag '$TAG' not found in CHANGELOG.md"
+            exit 1
+          fi
 
-                  echo "Using tag: $TAG"
+          echo "Using tag: $TAG"
 
-                  NOTES=$(awk "/^## $TAG/{flag=1; next} /^## /{flag=0} flag" CHANGELOG.md)
+          NOTES=$(awk "/^## $TAG/{flag=1; next} /^## /{flag=0} flag" CHANGELOG.md)
 
-                  echo "Extracted notes:"
-                  echo "$NOTES"
+          echo "Extracted notes:"
+          echo "$NOTES"
 
-                  {
-                    echo "changelog<<EOF"
-                    echo "$NOTES"
-                    echo "EOF"
-                  } >> "$GITHUB_OUTPUT"
+          {
+            echo "changelog<<EOF"
+            echo "$NOTES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
-    build:
-        name: Build DLL & Create Release
-        needs: check-changelog
-        runs-on: windows-latest # uses pwsh (PowerShell Core) as default shell
+  build:
+    name: Build DLL & Create Release
+    needs: check-changelog
+    runs-on: windows-latest # uses pwsh (PowerShell Core) as default shell
 
-        steps:
-            - name: 📥 Checkout repository (without submodules)
-              uses: actions/checkout@v4
-              with:
-                  submodules: false
+    steps:
+      - name: 📥 Checkout repository (without submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: false
 
-            - name: 🍆 Initialize submodules
-              run: ./scripts/init-submodules.bat
+      - name: 🍆 Initialize submodules
+        run: ./scripts/init-submodules.bat
 
-            - name: 🪟 Set up MSVC
-              uses: ilammy/msvc-dev-cmd@v1
+      - name: 🪟 Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
 
-            - name: ⚙️ Set up CMake
-              uses: jwlawson/actions-setup-cmake@v1
+      - name: ⚙️ Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
 
-            - name: 🥷 Set up Ninja
-              uses: seanmiddleditch/gha-setup-ninja@v3
+      - name: 🥷 Set up Ninja
+        uses: seanmiddleditch/gha-setup-ninja@v3
 
-            - name: 🧱 Configure using CMake preset
-              run: cmake --preset ninja-release
+      - name: 🧱 Configure using CMake preset
+        run: cmake --preset ninja-release
 
-            - name: 🔨 Build using CMake preset
-              run: cmake --build --preset Ninja-Release
+      - name: 🔨 Build using CMake preset
+        run: cmake --build --preset Ninja-Release
 
-            - name: 🥵 Prepare release files
-              shell: bash
-              run: |
-                  mkdir -p dist temp/installation_zip
-                  cp ./plugins/*.dll temp/installation_zip
-                  mv ./scripts/install.bat temp/installation_zip
-                  7z a "dist/${{ env.PLUGIN_NAME }}.zip" ./temp/installation_zip/*
+      - name: 🥵 Prepare release files
+        shell: bash
+        run: |
+          mkdir -p dist temp/installation_zip
+          cp ./plugins/*.dll temp/installation_zip
+          mv ./scripts/install.bat temp/installation_zip
+          7z a "dist/${{ env.PLUGIN_NAME }}.zip" ./temp/installation_zip/*
 
-            # - name: 🔑 Attest release ZIP
-            #   uses: actions/attest-build-provenance@v3
-            #   with:
-            #       subject-path: "dist/${{ env.PLUGIN_NAME }}.zip"
+      - name: 🔑 Attest release ZIP
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: "dist/${{ env.PLUGIN_NAME }}.zip"
 
-            - name: 🚀 Create release
-              id: create_release
-              uses: softprops/action-gh-release@v2
-              env:
-                  WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-              with:
-                  tag_name: ${{ env.TAG_NAME }}
-                  body: |
-                      ## Install Steps
-                      1. Close Rocket League
+      - name: 🚀 Create release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        env:
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          body: |
+            ## Install Steps
+            1. Close Rocket League
 
-                      2. Click `${{ env.PLUGIN_NAME }}.zip` below to download it
+            2. Click `${{ env.PLUGIN_NAME }}.zip` below to download it
 
-                      3. Extract `${{ env.PLUGIN_NAME }}.zip` and run `install.bat`
-                          <details> <summary>Getting an error when running <code>install.bat</code> ?</summary>
-                              <ul><br>
-                                  <li>Drag/drop <code>${{ env.PLUGIN_NAME }}.dll</code> into your bakkesmod plugins folder, usually located here:
-                                  <br><code>C:\Users\{YOUR USERNAME}\AppData\Roaming\bakkesmod\bakkesmod\plugins</code></li>
-                              </ul>
-                          </details>
-                          
-                      ## Notes
-                      ${{ needs.check-changelog.outputs.changelog }}
+            3. Extract `${{ env.PLUGIN_NAME }}.zip` and run `install.bat`
+                <details> <summary>Getting an error when running <code>install.bat</code> ?</summary>
+                    <ul><br>
+                        <li>Drag/drop <code>${{ env.PLUGIN_NAME }}.dll</code> into your bakkesmod plugins folder, usually located here:
+                        <br><code>C:\Users\{YOUR USERNAME}\AppData\Roaming\bakkesmod\bakkesmod\plugins</code></li>
+                    </ul>
+                </details>
+                
+            ## Notes
+            ${{ needs.check-changelog.outputs.changelog }}
 
-                      [GitHub build workflow](${{ env.WORKFLOW_URL }})
-                  files: dist/*.zip
+            [GitHub build workflow](${{ env.WORKFLOW_URL }})
+          files: dist/*.zip
 
-            # - name: 🤓 Post release info in discord channel
-            #         uses: sarisia/actions-status-discord@v1
-            #         with:
-            #           webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
-            #           nodetail: true
-            #           title: "**${{ env.PLUGIN_NAME_FORMATTED }}** `${{ env.TAG_NAME }}` has been released! 🚗 🚀"
-            #           description: |
-            #             ### Notes
-            #             ${{ needs.check-changelog.outputs.changelog }}
-            #
-            #             **Download:** [${{ env.TAG_NAME }}](${{ steps.create_release.outputs.url }})
-            #           color: 0xFF0730
+      - name: 🤓 Post release info in discord channel
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          nodetail: true
+          title: "**${{ env.PLUGIN_NAME_FORMATTED }}** `${{ env.TAG_NAME }}` has been released! 🚗"
+          description: |
+            ### Notes
+            ${{ needs.check-changelog.outputs.changelog }}
+
+            **Download:** [${{ env.TAG_NAME }}](${{ steps.create_release.outputs.url }})
+          color: 0xFF1AAA

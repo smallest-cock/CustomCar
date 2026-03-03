@@ -1,5 +1,5 @@
-#include "PluginConfig.hpp"
 #include "pch.h"
+#include "PluginConfig.hpp"
 #include "CustomCar.hpp"
 #include "util/logging.hpp"
 #include "util/Instances.hpp"
@@ -53,29 +53,5 @@ void CustomCar::initCvars() { registerCvar_Bool(Cvars::enabled, true).bindTo(m_e
 void CustomCar::initHooks() {}
 
 void CustomCar::initCommands() {
-
-	// test shit
-	registerCommand(Commands::test, [this](std::vector<std::string> args) {
-		static bool shouldHide = true;
-
-		// get game event
-		auto *pc = Instances.getPlayerController();
-		if (!pc || !pc->IsA<APlayerController_TA>())
-			return;
-		auto *pcta = static_cast<APlayerController_TA *>(pc);
-		auto *ge   = pcta->GetGameEvent();
-		if (!ge || !ge->IsA<AGameEvent_Soccar_TA>())
-			return;
-		auto *geta = static_cast<AGameEvent_Soccar_TA *>(ge);
-
-		for (auto *ball : geta->GameBalls) {
-			if (!validUObject(ball) || !validUObject(ball->StaticMesh))
-				continue;
-			auto *smc = ball->StaticMesh;
-			smc->SetHidden(shouldHide);
-			LOG("Set ball mesh to be {}", shouldHide ? "hidden" : "visible");
-			shouldHide = !shouldHide;
-		}
-		LOG("wowowowowowo");
-	});
+	registerCommand(Commands::test, [this](std::vector<std::string> args) { LOG("Did the test..."); });
 }
