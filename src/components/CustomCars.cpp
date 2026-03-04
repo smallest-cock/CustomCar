@@ -663,6 +663,9 @@ void ProductData::initProductData() {
 		return;
 	}
 
+	s_bodyProducts.clear();
+	s_topperProducts.clear();
+
 	for (UProduct_TA *prod : productsDatabase->Products_Pristine) {
 		if (!prod || !prod->Slot)
 			continue;

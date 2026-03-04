@@ -1,4 +1,3 @@
-#include "BakkesmodPluginTemplate/IMGUI/imgui.h"
 #include "pch.h"
 #include "GameCars.hpp"
 #include "components/CustomAssetTypes.hpp"
@@ -218,6 +217,16 @@ void GameCarsComponent::display_settings() {
 		GUI::verticalSpacing_relative(100.0f);
 
 		ImGui::SearchableCombo("RL cars", &currentCarNameIndex, carNames, "Select a car...", "Search...");
+
+		GUI::SameLineSpacing_relative(20.0f);
+
+		if (ImGui::Button("Refresh")) {
+			GAME_THREAD_EXECUTE({
+				ProductData::initProductData();
+				Instances.spawnNotification("Custom Car", "Refreshed RL cars list", 3, true);
+			});
+		}
+
 		ImGui::Text("%zu cars found", ProductData::s_bodyProducts.size());
 	}
 
