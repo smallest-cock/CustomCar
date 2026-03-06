@@ -15,7 +15,7 @@ private:
 	void initCvars();
 
 private:
-	std::shared_ptr<bool> m_useSpawnedCars = std::make_shared<bool>(false);
+	std::shared_ptr<bool> m_useSpawnedCars = std::make_shared<bool>(true);
 
 private:
 	fs::path m_persistanceJsonFile;

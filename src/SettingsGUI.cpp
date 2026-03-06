@@ -1,3 +1,4 @@
+#include "BakkesmodPluginTemplate/IMGUI/imgui.h"
 #include "pch.h"
 #include "CustomCar.hpp"
 #include "Cvars.hpp"
@@ -60,15 +61,32 @@ void CustomCar::RenderWindow() {
 		GameCars.display_settings();
 		ImGui::EndTabItem();
 	}
-	// if (ImGui::BeginTabItem("Info")) {
-	// 	info_tab();
-	// 	ImGui::EndTabItem();
-	// }
+	if (ImGui::BeginTabItem("Info")) {
+		info_tab();
+		ImGui::EndTabItem();
+	}
 	ImGui::EndTabBar();
 }
 
 void CustomCar::info_tab() {
+	static constexpr auto COOKEDPCCONSOLE_PATH = "C:\\Program Files\\Epic Games\\rocketleague\\TAGame\\CookedPCConsole";
+	static constexpr auto CUSTOMCARS_PATH =
+	    "C:\\Program Files\\Epic Games\\rocketleague\\TAGame\\CookedPCConsole\\mods\\CustomCars\\MyCustomCar.upk";
+
 	GUI::Spacing(2);
 
-	ImGui::TextUnformatted("Some plugin info ...");
+	GUI::ColoredTextFormat("For each custom car (or topper), there will be a {} file and a matching {} file.",
+	    GUI::WordColor{".json", GUI::Colors::LighterBlue},
+	    GUI::WordColor{".upk", GUI::Colors::LighterBlue});
+
+	ImGui::TextColored(
+	    GUI::Colors::Yellow, "\nThe .upk file MUST be placed inside the CookedPCConsole folder of your Rocket League installation!\n\n");
+
+	GUI::ColoredTextFormat("On Epic, it will be somewhere like this: {}", GUI::WordColor{COOKEDPCCONSOLE_PATH, GUI::Colors::LightGreen});
+	ImGui::TextUnformatted("On Steam, it will be somewhere else (you must figure it out... I don't have Steam)\n\n");
+
+	ImGui::TextUnformatted(
+	    "It's also recommended to put your .upk files in a subfolder so they don't get lost among the other files in CookedPCConsole.");
+
+	GUI::ColoredTextFormat("e.g. {}", GUI::WordColor{CUSTOMCARS_PATH, GUI::Colors::LightGreen});
 }

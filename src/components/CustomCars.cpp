@@ -564,13 +564,26 @@ void CustomCarsComponent::refreshCarModel() {
 
 void CustomCarsComponent::display_settings() {
 	{
+		static constexpr auto CUSTOMCARS_PATH =
+		    "C:\\Program Files\\Epic Games\\rocketleague\\TAGame\\CookedPCConsole\\mods\\CustomCars\\MyCustomCar.upk";
+
 		GUI::ScopedChild c{"Content", ImVec2(0, ImGui::GetContentRegionAvail().y * 0.9f)};
 
 		GUI::Spacing(2);
 
-		if (ImGui::Button("Open CustomCars folder"))
+		if (ImGui::Button("Open CustomCars folder")) {
 			Files::OpenFolder(m_customCarsFolder);
-		GUI::ToolTip("Put your custom car JSON files here");
+		}
+		if (ImGui::IsItemHovered()) {
+			GUI::ScopedTooltip t{};
+
+			ImGui::TextUnformatted("Put your custom car JSON files here\n\nAnd put the corresponding .upk file in the CookedPCConsole "
+			                       "folder of your Rocket League installation.\n");
+			GUI::ColoredTextFormat("e.g. {}", GUI::WordColor{CUSTOMCARS_PATH, GUI::Colors::LightGreen});
+
+			GUI::Spacing(2);
+			GUI::ColoredTextFormat("See the {} tab for more information", GUI::WordColor{"Info", GUI::Colors::LighterBlue});
+		}
 
 		GUI::SameLineSpacing_relative(20.0f);
 
@@ -666,6 +679,7 @@ void ProductData::initProductData() {
 	s_bodyProducts.clear();
 	s_topperProducts.clear();
 
+	LOGWARNING("{} products found in productsDatabase->Products_Pristine", productsDatabase->Products_Pristine.size());
 	for (UProduct_TA *prod : productsDatabase->Products_Pristine) {
 		if (!prod || !prod->Slot)
 			continue;

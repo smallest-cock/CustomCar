@@ -42,7 +42,7 @@ void GameCarsComponent::initHooks() {
 }
 
 void GameCarsComponent::initCvars() {
-	registerCvar_bool(Cvars::useSpawnedCars, false).bindTo(m_useSpawnedCars);
+	registerCvar_bool(Cvars::useSpawnedCars, true).bindTo(m_useSpawnedCars);
 	// ...
 }
 
@@ -203,17 +203,6 @@ void GameCarsComponent::display_settings() {
 	{
 		GUI::ScopedChild c{"Content", ImVec2(0, ImGui::GetContentRegionAvail().y * 0.8f)};
 
-		GUI::Spacing(2);
-
-		bool useSpawnedCars = useSpawnedCars_cvar.getBoolValue();
-		if (ImGui::Checkbox("Use spawned cars in game", &useSpawnedCars)) {
-			useSpawnedCars_cvar.setValue(useSpawnedCars);
-		}
-		GUI::ToolTip("If you join a match with a car you don't own, RL will force it to be a stocktane (server-side)."
-		             "\nSo your in-game hitbox will always be octane.\n\nAKA, you'll "
-		             "get the best "
-		             "results using octane hitbox cars");
-
 		GUI::verticalSpacing_relative(100.0f);
 
 		ImGui::SearchableCombo("RL cars", &currentCarNameIndex, carNames, "Select a car...", "Search...");
@@ -228,6 +217,18 @@ void GameCarsComponent::display_settings() {
 		}
 
 		ImGui::Text("%zu cars found", ProductData::s_bodyProducts.size());
+
+		GUI::verticalSpacing_relative(30.0f);
+		// GUI::Spacing(8);
+
+		bool useSpawnedCars = useSpawnedCars_cvar.getBoolValue();
+		if (ImGui::Checkbox("Use spawned cars in game", &useSpawnedCars)) {
+			useSpawnedCars_cvar.setValue(useSpawnedCars);
+		}
+		GUI::ToolTip("If you join a match with a car you don't own, RL will force it to be a stocktane (server-side)."
+		             "\nSo your in-game hitbox will always be octane.\n\nAKA, you'll "
+		             "get the best "
+		             "results using octane hitbox cars");
 	}
 
 	{

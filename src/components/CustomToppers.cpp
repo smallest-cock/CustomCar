@@ -1,5 +1,3 @@
-#include "BakkesmodPluginTemplate/IMGUI/imgui.h"
-#include "RLSDK/RLSDK_w_pch_includes/SDK_HEADERS/Extras.hpp"
 #include "pch.h"
 #include "CustomToppers.hpp"
 #include "components/CustomAssetTypes.hpp"
@@ -297,13 +295,26 @@ CustomTopperData *CustomToppersComponent::getCustomTopperDataFromProdId(ProductI
 
 void CustomToppersComponent::display_settings() {
 	{
+		static constexpr auto CUSTOMTOPPERS_PATH =
+		    "C:\\Program Files\\Epic Games\\rocketleague\\TAGame\\CookedPCConsole\\mods\\CustomToppers\\MyCustomTopper.upk";
+
 		GUI::ScopedChild c{"Content", ImVec2(0, ImGui::GetContentRegionAvail().y * 0.9f)};
 
 		GUI::Spacing(2);
 
-		if (ImGui::Button("Open CustomToppers folder"))
+		if (ImGui::Button("Open CustomToppers folder")) {
 			Files::OpenFolder(m_customToppersFolder);
-		GUI::ToolTip("Put your custom topper JSON files here");
+		}
+		if (ImGui::IsItemHovered()) {
+			GUI::ScopedTooltip t{};
+
+			ImGui::TextUnformatted("Put your custom topper JSON files here\n\nAnd put the corresponding .upk file in the CookedPCConsole "
+			                       "folder of your Rocket League installation.\n");
+			GUI::ColoredTextFormat("e.g. {}", GUI::WordColor{CUSTOMTOPPERS_PATH, GUI::Colors::LightGreen});
+
+			GUI::Spacing(2);
+			GUI::ColoredTextFormat("See the {} tab for more information", GUI::WordColor{"Info", GUI::Colors::LighterBlue});
+		}
 
 		GUI::SameLineSpacing_relative(20.0f);
 
