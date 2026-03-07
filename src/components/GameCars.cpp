@@ -212,7 +212,10 @@ void GameCarsComponent::display_settings() {
 		if (ImGui::Button("Refresh")) {
 			GAME_THREAD_EXECUTE({
 				ProductData::initProductData();
-				Instances.spawnNotification("Custom Car", "Refreshed RL cars list", 3, true);
+				std::string msg = std::format("Refreshed product data. Found {} bodies and {} toppers.",
+				    ProductData::s_bodyProducts.size(),
+				    ProductData::s_topperProducts.size());
+				Instances.spawnNotification("Custom Car", msg, 5, true);
 			});
 		}
 

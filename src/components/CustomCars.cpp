@@ -68,6 +68,7 @@ void CustomCarsComponent::initFolders() {
 
 void CustomCarsComponent::readInCustomAssetData() {
 	m_bodyCustomizations.clear();
+	size_t totalCustomCars = 0;
 
 	try {
 		for (const auto &entry : fs::recursive_directory_iterator(m_customCarsFolder)) {
@@ -86,13 +87,14 @@ void CustomCarsComponent::readInCustomAssetData() {
 					continue;
 				assetData->name = key;
 				m_bodyCustomizations[assetData->productId].bodies.emplace_back(*assetData);
+				totalCustomCars++;
 			}
 		}
 	} catch (const fs::filesystem_error &e) {
 		LOGERROR("Exception occured while reading data from folder \"{}\": {}", m_customCarsFolder.string(), e.what());
 	}
 
-	Instances.spawnNotification("Custom Car", std::format("Found {} custom cars", m_bodyCustomizations.size()), 3, true);
+	Instances.spawnNotification("Custom Car", std::format("Found {} custom cars", totalCustomCars), 3, true);
 }
 
 /*
@@ -577,8 +579,11 @@ void CustomCarsComponent::display_settings() {
 		if (ImGui::IsItemHovered()) {
 			GUI::ScopedTooltip t{};
 
-			ImGui::TextUnformatted("Put your custom car JSON files here\n\nAnd put the corresponding .upk file in the CookedPCConsole "
-			                       "folder of your Rocket League installation.\n");
+			ImGui::TextUnformatted("Put your custom car JSON files here\n\n");
+
+			GUI::ColoredTextFormat("And put the corresponding {} file in the CookedPCConsole folder of your Rocket League installation.",
+			    GUI::WordColor{".upk", GUI::Colors::LighterBlue});
+
 			GUI::ColoredTextFormat("e.g. {}", GUI::WordColor{CUSTOMCARS_PATH, GUI::Colors::LightGreen});
 
 			GUI::Spacing(2);
@@ -670,22 +675,49 @@ class CustomCarsComponent CustomCars;
 // ##############################################################################################################
 
 void ProductData::initProductData() {
-	auto *productsDatabase = Instances.getInstanceOf<UProductDatabase_TA>();
-	if (!productsDatabase) {
+	auto *productDb = Instances.getInstanceOf<UProductDatabase_TA>();
+	if (!productDb) {
 		LOGERROR("UProductDatabase_TA* is null... unable to init product data");
 		return;
+	}
+
+	// debug
+	int32_t pristineSize = productDb->Products_Pristine.size();
+	int32_t newSize      = productDb->Products_New.size();
+	LOGWARNING("productDb->Products_Pristine size: {}", pristineSize);
+	LOGWARNING("productDb->Products_New size: {}", newSize);
+	if (pristineSize == 0 && newSize == 0) {
+		LOGERROR("Products_Pristine and Products_New TArrays are empty! Cannot initialize product data");
+		return;
+	}
+	TArray<UProduct_TA *> &products = productDb->Products_Pristine;
+	if (pristineSize == 0) {
+		products = productDb->Products_New;
+		LOGWARNING("Products_Pristine TArray is empty, so using Products_New (contains {} products)", newSize);
 	}
 
 	s_bodyProducts.clear();
 	s_topperProducts.clear();
 
-	LOGWARNING("{} products found in productsDatabase->Products_Pristine", productsDatabase->Products_Pristine.size());
-	for (UProduct_TA *prod : productsDatabase->Products_Pristine) {
+	// NOTE: Can also store the UProductSlot_TA ptrs for body and topper in static vars, and just compare those ptrs with prod->Slot
+	// ... the UProductSlot_TA for body has RF_ArchetypeObject flag btw
+	/*
+	 * Product Slot --> SlotIndex
+	 * ------------------------
+	 *  Body --> 0
+	 *  Topper --> 5
+	 */
+	static constexpr int32_t BODY_SLOT   = 0;
+	static constexpr int32_t TOPPER_SLOT = 5;
+
+	size_t productsChecked = 0;
+	for (UProduct_TA *prod : products) {
 		if (!prod || !prod->Slot)
 			continue;
 
-		int32_t id = prod->GetID();
-		if (prod->Slot->Label == L"Body") {
+		switch (prod->Slot->SlotIndex) {
+		case BODY_SLOT: {
+			int32_t     id = prod->GetID();
 			ProductData data{};
 			data.id   = id;
 			data.name = prod->LongLabel.ToString();
@@ -693,13 +725,23 @@ void ProductData::initProductData() {
 			// TODO: Maybe call a func to parse the hitbox from a given body UProduct_TA*?? Might need a BodyProductData child class...
 
 			s_bodyProducts[id] = std::move(data);
-		} else if (prod->Slot->Label == L"Topper") {
+			break;
+		}
+		case TOPPER_SLOT: {
+			int32_t     id = prod->GetID();
 			ProductData data{};
 			data.id              = id;
 			data.name            = prod->LongLabel.ToString();
 			s_topperProducts[id] = std::move(data);
+			break;
 		}
+		}
+
+		productsChecked++;
 	}
 
-	LOG("Initialized product data. {} body products, {} topper products", s_bodyProducts.size(), s_topperProducts.size());
+	LOG("Initialized product data. Checked {} products with a slot. Found {} body products and {} topper products",
+	    productsChecked,
+	    s_bodyProducts.size(),
+	    s_topperProducts.size());
 }

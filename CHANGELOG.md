@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.2
+- Changed the method of reading product data to (hopefully) fix bug of no RL cars showing up for some users
+- Improved plugin notifications
+    - The number of custom cars/toppers found is now accurate
+- Minor improvements to UI tooltips
+
 ## v1.0.1-hotfix2
 - Made the "Use spawned cars in game" checkbox more visible and enabled by default
 - Added an Info tab in settings to further explain custom car/topper installation

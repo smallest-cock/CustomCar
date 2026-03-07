@@ -52,6 +52,7 @@ void CustomToppersComponent::initFolders() {
 
 void CustomToppersComponent::readInCustomAssetData() {
 	m_topperCustomizations.clear();
+	size_t totalCustomToppers = 0;
 
 	try {
 		for (const auto &entry : fs::recursive_directory_iterator(m_customToppersFolder)) {
@@ -70,6 +71,7 @@ void CustomToppersComponent::readInCustomAssetData() {
 					continue;
 				assetData->name = key;
 				m_topperCustomizations[assetData->productId].toppers.emplace_back(*assetData);
+				totalCustomToppers++;
 			}
 		}
 	} catch (const fs::filesystem_error &e) {
@@ -77,7 +79,7 @@ void CustomToppersComponent::readInCustomAssetData() {
 	}
 
 	// findDefaultProductData(); // always call this to update the state of m_bodyProducts as well, to keep everything in sync
-	Instances.spawnNotification("Custom Car", std::format("Found {} custom toppers", m_topperCustomizations.size()), 3, true);
+	Instances.spawnNotification("Custom Car", std::format("Found {} custom toppers", totalCustomToppers), 3, true);
 }
 
 /*
@@ -308,8 +310,11 @@ void CustomToppersComponent::display_settings() {
 		if (ImGui::IsItemHovered()) {
 			GUI::ScopedTooltip t{};
 
-			ImGui::TextUnformatted("Put your custom topper JSON files here\n\nAnd put the corresponding .upk file in the CookedPCConsole "
-			                       "folder of your Rocket League installation.\n");
+			ImGui::TextUnformatted("Put your custom topper JSON files here\n\n");
+
+			GUI::ColoredTextFormat("And put the corresponding {} file in the CookedPCConsole folder of your Rocket League installation.",
+			    GUI::WordColor{".upk", GUI::Colors::LighterBlue});
+
 			GUI::ColoredTextFormat("e.g. {}", GUI::WordColor{CUSTOMTOPPERS_PATH, GUI::Colors::LightGreen});
 
 			GUI::Spacing(2);
