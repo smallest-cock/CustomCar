@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.3
+- Updated internal SDK to match latest RL version (v2.66)
+
 ## v1.0.2
 - Changed the method of reading product data to (hopefully) fix bug of no RL cars showing up for some users
 - Improved plugin notifications
