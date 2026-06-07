@@ -2,4 +2,4 @@ Diagnostics:
     Includes:
         IgnoreHeader: pch\.h
 CompileFlags:
-    CompilationDatabase: build/ninja/ninja-release
+    CompilationDatabase: build/ninja/local-linux

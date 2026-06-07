@@ -12,16 +12,16 @@
 #include <filesystem>
 #include <fstream>
 #include <optional>
-#include <string_view>
+// #include <string_view>
 #include <thread>
 
-std::unordered_map<int, std::string> g_baseHitboxIds = {{22, "Breakout"},
-    {23, "Octane"},
-    {24, "Plank"},  // Paladin ID, plank hitbox
-    {28, "Hybrid"}, // X-Devil ID, hybrid hitbox
-    {30, "Merc"},
-    {31, "Hybrid"}, // Venom ID, hybrid hitbox
-    {403, "Dominus"}};
+// std::unordered_map<int, std::string> g_baseHitboxIds = {{22, "Breakout"},
+//     {23, "Octane"},
+//     {24, "Plank"},  // Paladin ID, plank hitbox
+//     {28, "Hybrid"}, // X-Devil ID, hybrid hitbox
+//     {30, "Merc"},
+//     {31, "Hybrid"}, // Venom ID, hybrid hitbox
+//     {403, "Dominus"}};
 
 // ##############################################################################################################
 // ###############################################    INIT    ###################################################
@@ -404,7 +404,7 @@ void CustomCarsComponent::fixBodyFX(UCarMeshComponent_TA *cmc, CustomBodyData *c
 	for (int i = 0; i < m_boostSocketNames.size(); ++i) {
 		std::string socketName = m_boostSocketNames[i].ToString();
 		auto       *meshCmp    = UnrealCast<UStaticMeshComponent>(
-            cmc->BodyFXActor->GetComponentByName(UStaticMeshComponent::StaticClass(), m_boostSocketNames[i]));
+		    cmc->BodyFXActor->GetComponentByName(UStaticMeshComponent::StaticClass(), m_boostSocketNames[i]));
 		if (!meshCmp) {
 			DLOGWARNING("UStaticMeshComponent* from cmc->BodyFXActor->GetComponentByName(...) for {} is null. Apparenly the original "
 			            "Body FXActor doesn't have a mesh component for that socket.",
@@ -451,9 +451,11 @@ void CustomCarsComponent::fixBodyFX(UCarMeshComponent_TA *cmc, CustomBodyData *c
 
 // ##############################################################################################################
 
-std::optional<CustomBodyData> CustomCarsComponent::createBodyDataFromJson(const json &j) {
-	auto idIt       = j.find("BodyId");
-	auto meshPathIt = j.find("MeshPath");
+std::optional<CustomBodyData> CustomCarsComponent::createBodyDataFromJson(const json &rawJson) {
+	const auto j = Files::normalizeJsonKeys(rawJson);
+
+	auto idIt       = j.find("bodyid");
+	auto meshPathIt = j.find("meshpath");
 	if (idIt == j.end() || meshPathIt == j.end()) // required values
 		return std::nullopt;
 
@@ -463,16 +465,16 @@ std::optional<CustomBodyData> CustomCarsComponent::createBodyDataFromJson(const 
 		body.productId = idIt->get<int32_t>();
 		body.assetPath = meshPathIt->get<std::string>();
 
-		readOptionalJsonVal<int32_t>(j, "ChassisMaterialIndex", body.chassisMatIndex);
-		readOptionalJsonVal<int32_t>(j, "SkinMaterialIndex", body.skinMatIndex);
-		readOptionalJsonVal<int32_t>(j, "BrakelightMaterialIndex", body.brakelightMatIndex);
-		readOptionalJsonVal<float>(j, "SuspensionStiffnessScale", body.suspensionStiffnessScale);
+		readOptionalJsonVal<int32_t>(j, "chassismaterialindex", body.chassisMatIndex);
+		readOptionalJsonVal<int32_t>(j, "skinmaterialindex", body.skinMatIndex);
+		readOptionalJsonVal<int32_t>(j, "brakelightmaterialindex", body.brakelightMatIndex);
+		readOptionalJsonVal<float>(j, "suspensionstiffnessscale", body.suspensionStiffnessScale);
 
-		if (auto it = j.find("WheelScale"); it != j.end()) {
+		if (auto it = j.find("wheelscale"); it != j.end()) {
 			const auto &wheelScaleVal = *it;
 			if (wheelScaleVal.is_object()) {
-				readOptionalJsonVal<float>(wheelScaleVal, "Front", body.wheelScaleFront);
-				readOptionalJsonVal<float>(wheelScaleVal, "Back", body.wheelScaleBack);
+				readOptionalJsonVal<float>(wheelScaleVal, "front", body.wheelScaleFront);
+				readOptionalJsonVal<float>(wheelScaleVal, "back", body.wheelScaleBack);
 			} else if (wheelScaleVal.is_number_float()) {
 				const float scale    = wheelScaleVal.get<float>();
 				body.wheelScaleFront = scale;
@@ -480,9 +482,9 @@ std::optional<CustomBodyData> CustomCarsComponent::createBodyDataFromJson(const 
 			}
 		}
 
-		if (auto it = j.find("HideWheels"); it != j.end())
+		if (auto it = j.find("hidewheels"); it != j.end())
 			body.hideWheels = it->get<bool>();
-		if (auto it = j.find("HideTrails"); it != j.end())
+		if (auto it = j.find("hidetrails"); it != j.end())
 			body.hideTrails = it->get<bool>();
 	} catch (const json::exception &e) {
 		LOGERROR("Unable to read JSON data: \"{}\"", e.what());

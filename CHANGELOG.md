@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.0.5
+- Improved custom asset JSON parsing
+    - Key capitalization is now ignored
+    - Should fix the issue of some cars not loading due to their JSON keys not being in PascalCase
+
 ## v1.0.4
 - Updated internal SDK to match latest RL version (v2.69)
 

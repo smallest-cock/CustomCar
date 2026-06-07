@@ -258,10 +258,12 @@ void CustomToppersComponent::refreshCarModel() {
  *
  */
 // TODO: maybe add a bool for whether the custom asset is a SK or SM.. since some toppers are animated (and i assume SK)
-std::optional<CustomTopperData> CustomToppersComponent::createTopperDataFromJson(const json &j) {
-	auto idIt       = j.find("TopperId");
-	auto meshPathIt = j.find("MeshPath");
-	auto matPathIt  = j.find("MaterialPath"); // NOTE: might be unnecessary? bc maybe lesbian topper was just made wrong in UDK?
+std::optional<CustomTopperData> CustomToppersComponent::createTopperDataFromJson(const json &rawJson) {
+	auto j = Files::normalizeJsonKeys(rawJson);
+
+	auto idIt       = j.find("topperid");
+	auto meshPathIt = j.find("meshpath");
+	auto matPathIt  = j.find("materialpath"); // NOTE: might be unnecessary? bc maybe lesbian topper was just made wrong in UDK?
 	if (idIt == j.end() || meshPathIt == j.end() || matPathIt == j.end()) // required values
 		return std::nullopt;
 
@@ -272,7 +274,7 @@ std::optional<CustomTopperData> CustomToppersComponent::createTopperDataFromJson
 		topper.assetPath    = meshPathIt->get<std::string>();
 		topper.materialPath = matPathIt->get<std::string>();
 
-		readOptionalJsonVal<float>(j, "Scale", topper.scale);
+		readOptionalJsonVal<float>(j, "scale", topper.scale);
 	} catch (const json::exception &e) {
 		LOGERROR("Unable to read JSON data: \"{}\"", e.what());
 		return std::nullopt;
@@ -376,7 +378,7 @@ void CustomToppersComponent::display_settings() {
 						auto              it       = ProductData::s_topperProducts.find(prodId);
 						const auto       &prodData = it->second;
 						const std::string label    = std::format(
-                            "{} (ID: {}) custom UProductAsset_Attachment_TA instance:", prodData.name, prodId);
+						    "{} (ID: {}) custom UProductAsset_Attachment_TA instance:", prodData.name, prodId);
 						if (it == ProductData::s_topperProducts.end())
 							continue;
 						ImGui::BulletText("%s", label.c_str());

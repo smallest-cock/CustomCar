@@ -3,6 +3,7 @@
 #include "util/Logging.hpp"
 #include "util/HookManager.hpp"
 #include "Cvars.hpp"
+#include <string_view>
 
 template <typename Derived>
 class Component {

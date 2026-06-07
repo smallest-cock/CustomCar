@@ -15,10 +15,12 @@
                 "value": "x64",
                 "strategy": "external"
             },
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Windows"
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl",
+                "CMAKE_LINKER": "link",
+                "CMAKE_CXX_FLAGS": "/std:c++20 /EHsc /MP /Zi /O2",
+                "CMAKE_SYSTEM_NAME": "Windows"
             }
         },
         {
@@ -37,10 +39,7 @@
             "displayName": "Ninja + cl.exe (RelWithDebInfo)",
             "inherits": "ninja-base",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-                "CMAKE_CXX_COMPILER": "cl",
-                "CMAKE_LINKER": "link",
-                "CMAKE_CXX_FLAGS": "/std:c++20 /EHsc /MP /Zi /O2"
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
             }
         },
         {
@@ -49,9 +48,6 @@
             "inherits": "ninja-base",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CXX_COMPILER": "cl",
-                "CMAKE_LINKER": "link",
-                "CMAKE_CXX_FLAGS": "/std:c++20 /EHsc /MP /Zi /O2",
                 "CUSTOM_DEFINES": "DEBUG_LOGGING"
             }
         },

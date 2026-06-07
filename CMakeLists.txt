@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(CustomCar VERSION 1.0.4)
+project(CustomCar VERSION 1.0.5)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -140,12 +140,23 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 if(NOT "$ENV{CI}" STREQUAL "true")
-    set(INSTALLED_BMSDK_DIR "$ENV{APPDATA}/bakkesmod/bakkesmod/bakkesmodsdk" CACHE PATH "Installed BakkesMod SDK directory")
+    if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+        set(INSTALLED_BMSDK_DIR "$ENV{APPDATA}/bakkesmod/bakkesmod/bakkesmodsdk" CACHE PATH "Installed BakkesMod SDK directory")
 
-    add_custom_command(
-        TARGET ${PROJECT_NAME}
-        POST_BUILD
-        COMMAND "${INSTALLED_BMSDK_DIR}/bakkesmod-patch.exe" "$<TARGET_FILE:${PROJECT_NAME}>"
-        COMMENT "Running bakkesmod-patch.exe after building ${PROJECT_NAME}"
-    )
+        add_custom_command(
+            TARGET ${PROJECT_NAME}
+            POST_BUILD
+            COMMAND "${INSTALLED_BMSDK_DIR}/bakkesmod-patch.exe" "$<TARGET_FILE:${PROJECT_NAME}>"
+            COMMENT "Running bakkesmod-patch.exe after building ${PROJECT_NAME}"
+        )
+    else()
+        # INSTALLED_BMSDK_DIR should be defined in a CMakeUserPresets.json
+
+        add_custom_command(
+            TARGET ${PROJECT_NAME}
+            POST_BUILD
+            COMMAND cp ${CMAKE_SOURCE_DIR}/plugins/$<TARGET_FILE_NAME:${PROJECT_NAME}> ${INSTALLED_BMSDK_DIR}/plugins
+            COMMENT "Copying plugin DLL to BakkesMod plugins directory"
+        )
+    endif()
 endif()
