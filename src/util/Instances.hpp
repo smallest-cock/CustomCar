@@ -1,9 +1,8 @@
 #pragma once
-#include "RLSDK/RLSDK_w_pch_includes/SDK_HEADERS/Core_classes.hpp"
-#include "RLSDK/RLSDK_w_pch_includes/SDK_HEADERS/Engine_classes.hpp"
-#include "RLSDK/RLSDK_w_pch_includes/SDK_HEADERS/Extras.hpp"
 #include "pch.h"
-// #include "ModUtils/util/Utils.hpp"
+#include "RLSDK/RLSDK/SDK_HEADERS/Core_classes.hpp"
+#include "RLSDK/RLSDK/SDK_HEADERS/Engine_classes.hpp"
+#include "RLSDK/RLSDK/SDK_HEADERS/Extras.hpp"
 
 static constexpr int32_t INSTANCES_INTERATE_OFFSET = 10;
 

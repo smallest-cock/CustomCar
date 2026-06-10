@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(CustomCar VERSION 1.0.5)
+project(CustomCar VERSION 1.0.6)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -52,7 +52,7 @@ set(COMPONENTS_SRC
 )
 
 
-set(RLSDK_DIR "${EXTERNAL_DIR}/RLSDK/RLSDK_w_pch_includes")
+set(RLSDK_DIR "${EXTERNAL_DIR}/RLSDK/RLSDK")
 set(RLSDK_SRC
     ${RLSDK_DIR}/GameDefines.cpp
     # ${RLSDK_DIR}/SDK_HEADERS/AkAudio_classes.cpp
@@ -99,7 +99,7 @@ endif()
 add_link_options(/DEBUG /INCREMENTAL:NO /OPT:REF /OPT:ICF)
 
 add_compile_options(${compile_options})
-add_compile_definitions(UNICODE _UNICODE)
+add_compile_definitions(UNICODE _UNICODE USE_PCH)
 
 if (CMAKE_SIZEOF_VOID_P EQUAL 4)
     message(FATAL_ERROR

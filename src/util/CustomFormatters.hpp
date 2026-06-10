@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RLSDK/RLSDK_w_pch_includes/SDK_HEADERS/Core_structs.hpp"
+#include "RLSDK/RLSDK/SDK_HEADERS/Core_structs.hpp"
 template <>
 struct std::formatter<FString> {
 	constexpr auto parse(std::format_parse_context &ctx) { return ctx.begin(); }

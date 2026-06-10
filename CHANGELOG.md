@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.6
+- Updated internal SDK to match latest RL version (v2.70)
+
 ## v1.0.5
 - Improved custom asset JSON parsing
     - Key capitalization is now ignored
