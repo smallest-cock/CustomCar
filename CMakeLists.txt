@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(CustomCar VERSION 1.0.6)
+project(CustomCar VERSION 1.0.7)
 
 set(CMAKE_CXX_STANDARD 20)
 
