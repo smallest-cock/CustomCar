@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "PluginHelperBase.hpp"
 #include "util/HookManager.hpp"
-#include "util/Logging.hpp"
+#include "util/logging.hpp"
 
 // cvars
 CVarWrapper PluginHelperBase::registerCvar_Bool(const CvarData &cvar, bool startingValue) {

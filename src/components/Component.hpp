@@ -1,6 +1,6 @@
 #pragma once
 #include "util/Instances.hpp"
-#include "util/Logging.hpp"
+#include "util/logging.hpp"
 #include "util/HookManager.hpp"
 #include "Cvars.hpp"
 #include <string_view>
