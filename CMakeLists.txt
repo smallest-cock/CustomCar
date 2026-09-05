@@ -98,6 +98,10 @@ endif()
 
 add_link_options(/DEBUG /INCREMENTAL:NO /OPT:REF /OPT:ICF)
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(-Wno-nontrivial-memcall)
+endif()
+
 add_compile_options(${compile_options})
 add_compile_definitions(UNICODE _UNICODE USE_PCH)
 
@@ -150,13 +154,14 @@ if(NOT "$ENV{CI}" STREQUAL "true")
             COMMENT "Running bakkesmod-patch.exe after building ${PROJECT_NAME}"
         )
     else()
-        # INSTALLED_BMSDK_DIR should be defined in a CMakeUserPresets.json
-
-        add_custom_command(
-            TARGET ${PROJECT_NAME}
-            POST_BUILD
-            COMMAND cp ${CMAKE_SOURCE_DIR}/plugins/$<TARGET_FILE_NAME:${PROJECT_NAME}> ${INSTALLED_BMSDK_DIR}/plugins
-            COMMENT "Copying plugin DLL to BakkesMod plugins directory"
-        )
+        set(_post_build_script "${CMAKE_SOURCE_DIR}/scripts/post-build-linux.sh")
+        if(EXISTS "${_post_build_script}")
+            add_custom_command(
+                TARGET ${PROJECT_NAME}
+                POST_BUILD
+                COMMAND bash "${_post_build_script}" "$<TARGET_FILE:${PROJECT_NAME}>"
+                COMMENT "Running local (linux) post-build hook after building ${PROJECT_NAME}"
+            )
+        endif()
     endif()
 endif()
