@@ -65,19 +65,8 @@
           "name": "linux-clang-cl",
           "generator": "Ninja",
           "binaryDir": "${sourceDir}/build/ninja/clang-cl-release",
-          "environment": {
-              "INCLUDE": "/home/fucker/msvc/vc/tools/msvc/14.51.36231/include;/home/fucker/msvc/kits/10/include/10.0.26100.0/ucrt;/home/fucker/msvc/kits/10/include/10.0.26100.0/shared;/home/fucker/msvc/kits/10/include/10.0.26100.0/um;/home/fucker/msvc/kits/10/include/10.0.26100.0/winrt",
-              "LIB":"/home/fucker/msvc/vc/tools/msvc/14.51.36231/lib/x64;/home/fucker/msvc/kits/10/lib/10.0.26100.0/ucrt/x64;/home/fucker/msvc/kits/10/lib/10.0.26100.0/um/x64"
-          },
+          "toolchainFile": "${sourceDir}/cmake/toolchains/clang-cl-cross.cmake",
           "cacheVariables": {
-            "CMAKE_SYSTEM_NAME": "Windows",
-            "CMAKE_SYSTEM_PROCESSOR": "AMD64",
-            "CMAKE_C_COMPILER": "clang-cl",
-            "CMAKE_CXX_COMPILER": "clang-cl",
-            "CMAKE_CXX_COMPILER_TARGET": "x86_64-pc-windows-msvc",
-            "CMAKE_LINKER": "lld-link",
-            "CMAKE_RC_COMPILER": "llvm-rc",
-            "CMAKE_MT": "llvm-mt",
             "CMAKE_BUILD_TYPE": "RelWithDebInfo"
           }
         }

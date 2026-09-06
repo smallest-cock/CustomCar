@@ -19,12 +19,21 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(compile_options
     /std:c++20
     /EHsc
-    /MP
-
     /Zi # generate debug info
     /O2 # optimize
-    /bigobj # handle the massive rlsdk files
+    /bigobj # handle massive rlsdk files
 )
+
+# suppress Clang-specific warnings (that MSVC ignores)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(
+        -Wno-nontrivial-memcall
+        -Wno-sizeof-array-argument
+        -Wno-absolute-value
+        -Wno-deprecated-enum-enum-conversion
+        -Wno-extra-qualification
+    )
+endif()
 
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 set(BMSDK_DIR "${EXTERNAL_DIR}/BMSDK")
@@ -97,10 +106,6 @@ if(CUSTOM_DEFINES)
 endif()
 
 add_link_options(/DEBUG /INCREMENTAL:NO /OPT:REF /OPT:ICF)
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    add_compile_options(-Wno-nontrivial-memcall)
-endif()
 
 add_compile_options(${compile_options})
 add_compile_definitions(UNICODE _UNICODE USE_PCH)

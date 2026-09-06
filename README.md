@@ -1,7 +1,7 @@
 # Custom Car (BakkesMod plugin)
 Enables custom cars in Rocket League, for free!
 
-🎥 Video showcase: https://www.youtube.com/watch?v=Ipqlp0zsMZc
+Video showcase: https://www.youtube.com/watch?v=Ipqlp0zsMZc
 
 <img src="./assets/screenshots/mc_boat_still.png" width="80%"/>
 
@@ -16,10 +16,10 @@ Enables custom cars in Rocket League, for free!
 > [!NOTE]
 > BakkesMod is no longer enabled in online games due to the addition of EAC on **April 28, 2026**
 
-## 💻 Install the plugin
+## Install the plugin
 Follow the install steps in the [latest release](https://github.com/smallest-cock/CustomCar/releases/latest)
 
-## 📂 How to INSTALL custom cars
+## How to INSTALL custom cars
 1. Download (or [create](https://youtu.be/OlwnVdYyhbk)) a custom car. You can find some [here](https://alphaconsole.io/browse?category=model)
 2. Extract the `.zip` file. Somewhere inside will be a `.json` file and a `.upk` file
 3. Click the `Open CustomCars folder` button in the plugin, and put the `.json` file in that folder
@@ -30,28 +30,19 @@ Follow the install steps in the [latest release](https://github.com/smallest-coc
       ```
     - You can create subfolders to organize your `.upk` files if you want. As long as the `.upk` files are somewhere inside the `CookedPCConsole` folder
 
-## 🧪 How to MAKE custom cars
+## How to MAKE custom cars
 Here's a video tutorial: https://youtu.be/OlwnVdYyhbk
   - Make sure to put the `.json` files in `bakkesmod\data\CustomCar\CustomCars` instead of the `acplugin` folder shown in the video
 
-## 🔨 Building
-> [!NOTE]  
-> Building requires **64-bit Windows** and the **MSVC** toolchain, due to reliance on the Windows SDK and the need for ABI compatibility with Rocket League
+## Building
+Build with CMake using a compatible toolchain for your platform:
+- **Windows:** MSVC (via Visual Studio or the Build Tools)
+- **Linux:** clang-cl + lld-link
+    - Cross-compiles against a local MSVC/Windows SDK install (obtained via [msvc-wine](https://github.com/mstorsjo/msvc-wine))
 
-### 1. Initialize submodules
-Run `./scripts/init-submodules.bat` to initialize the submodules after cloning the repo
-
-<details> <summary>🔍 Why this instead of <code>git submodule update --init --recursive</code> ?</summary>
-   <ul>
-       <li>Avoids downloading 200MB of history for the <strong>nlohmann/json</strong> library</li>
-       <li>Ensures Git can detect updates for the other submodules</li>
-   </ul>
-</details>
-
-### 2. Build with CMake
 > [!NOTE]
-> Before building with CMake, the MSVC environment **must** be initialized.
-> This is normally handled automatically by IDEs or certain editor extensions like [CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools), but if you're building from the command line, use one of the following methods:
+> Before building with CMake on Windows, the MSVC environment **must** be initialized.
+> This is normally handled automatically by IDEs or certain editor extensions like [CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools), but if you're building from the command line, do one of the following:
 >
 > - Use an appropriate Windows terminal profile:
 >    - `Developer PowerShell for VS 2022`
@@ -61,16 +52,27 @@ Run `./scripts/init-submodules.bat` to initialize the submodules after cloning t
 >   C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat
 >   ```
 
-0. Install [CMake](https://cmake.org/download) and [Ninja](https://github.com/ninja-build/ninja/releases)
-   - If you prefer another build system, just create a `CMakeUserPresets.json` and specify it there. [More info here](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html)
-1. Run this to configure build files:
-    ```
-    cmake --preset ninja-release
-    ```
-   - Other configure presets are available in `CMakePresets.json`
-2. Run this to build:
-    ```
-    cmake --build --preset Ninja-Release
-    ```
-   - Other build presets are available in `CMakePresets.json`
-   - The built binaries will be in `./plugins`
+### 1. Initialize submodules
+| Windows | Linux |
+|----------|---------|
+| `./scripts/init-submodules.bat` | `./scripts/init-submodules.sh` |
+
+<details> <summary>Why a script instead of <code>git submodule update --init --recursive</code> ?</summary>
+   <ul>
+       <li>Avoids downloading 200MB of history for the <strong>nlohmann/json</strong> library</li>
+       <li>Ensures Git can detect updates for the other submodules</li>
+       <li>On Linux, applies additional submodule fixes to account for a <strong>case-sensitive filesystem</strong> and <strong>MSVC vs Clang</strong> compilation compatibility</li>
+   </ul>
+</details>
+
+### 2. Build with CMake
+Make sure to have [CMake](https://cmake.org/download) and [Ninja](https://github.com/ninja-build/ninja) installed
+- For custom builds (e.g. a different generator than Ninja), create a `CMakeUserPresets.json` and specify it there. [more info](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html)
+
+| Step | Windows | Linux |
+|-------------------|-----------------|---------------|
+| 1. Configure | `cmake --preset ninja-release` | `cmake --preset linux-clang-cl` |
+| 2. Build | `cmake --build --preset Ninja-Release` | `cmake --build --preset Ninja-Release-Clang` |
+
+- Other presets available in `CMakePresets.json`
+- Output binaries will be in `./plugins`

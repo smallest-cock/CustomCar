@@ -22,5 +22,24 @@ setup_branch_submodule external/RLSDK main
 setup_branch_submodule external/ModUtils main
 setup_branch_submodule external/BMSDK master
 setup_branch_submodule external/BakkesmodPluginTemplate master
-
 git submodule status
+
+
+# Linux-only: vendored submodules assume a case-insensitive filesystem
+# and rely on a couple of MSVC-only implicit casts. Fix both up so the
+# tree builds cleanly on a case-sensitive filesystem with clang-cl.
+if [[ "$(uname -s)" == "Linux" ]]; then
+    echo "==> Fixing BMSDK include casing..."
+    python3 scripts/fix_include_casing.py external/BMSDK
+
+    echo "==> Patching imgui_impl_dx11.cpp narrowing casts..."
+    if git -C external/BakkesmodPluginTemplate apply --reverse --check patches/plugin-template-imgui-fix.patch &>/dev/null; then
+        echo "    already applied, skipping."
+    elif git -C external/BakkesmodPluginTemplate apply --check patches/plugin-template-imgui-fix.patch &>/dev/null; then
+        git -C external/BakkesmodPluginTemplate apply patches/plugin-template-imgui-fix.patch
+    else
+        echo "    ERROR: patch does not apply cleanly. Submodule may have been updated" >&2
+        echo "    upstream — the patch likely needs regenerating." >&2
+        exit 1
+    fi
+fi

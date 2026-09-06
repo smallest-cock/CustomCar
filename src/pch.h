@@ -17,11 +17,11 @@
 
 #include <limits.h>
 #include <Windows.h>
-#include <Psapi.h>
+#include <psapi.h>
 #include <iostream>
 #include <fstream>
 #include <shellapi.h>
-#pragma comment(lib, "Shlwapi.lib")
+#pragma comment(lib, "shlwapi.lib")
 
 #include <json/single_include/nlohmann/json.hpp>
 
