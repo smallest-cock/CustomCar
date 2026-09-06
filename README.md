@@ -16,7 +16,7 @@ Video showcase: https://www.youtube.com/watch?v=Ipqlp0zsMZc
 > [!NOTE]
 > BakkesMod is no longer enabled in online games due to the addition of EAC on **April 28, 2026**
 
-## Install the plugin
+## How to install
 Follow the install steps in the [latest release](https://github.com/smallest-cock/CustomCar/releases/latest)
 
 ## How to INSTALL custom cars
